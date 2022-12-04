@@ -33,3 +33,4 @@
 []Pogledni v userService, v authControllera i authMiddleware za iziskvaniqta za user(username, email, password)
 []Smeni imeto na basata v index.js
 []Ako v modela na usera imame pole array colekciq , dobavqm go i v userServisa, setvaiki go na prazen masiv
+[]Register and Login formite, name dali ima

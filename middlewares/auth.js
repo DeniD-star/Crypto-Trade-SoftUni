@@ -13,12 +13,12 @@ module.exports =()=> (req, res, next)=>{
         //attach functions to context
         if(parseToken(req, res)){
             req.auth = {
-                async register(email, username, password){
-                        const token = await register(email, username, password);
+                async register( username, email, password){
+                        const token = await register( username, email, password);
                         res.cookie(COOKIE_NAME, token);
                 },
-                 async login(username, password){
-                    const token = await login(username, password);
+                 async login(email, password){
+                    const token = await login(email, password);
                     res.cookie(COOKIE_NAME, token);
                 },
                 logout(){
@@ -36,7 +36,7 @@ module.exports =()=> (req, res, next)=>{
        
 }
 
-async function register(email, username, password){
+async function register(username, email, password){
     const existingUsername = await userService.getUserByUsername(username);
     const existingEmail = await userService.getUserByUsername(email);
 
@@ -51,16 +51,18 @@ async function register(email, username, password){
     //1. we hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
     //i sega go suzdavame
-    const user = await userService.createUser(email, username, hashedPassword);
+    const user = await userService.createUser(username, email, hashedPassword);
 
     return generateToken(user);
 }
-async function login( username, password){
-    const user = await userService.getUserByUsername(username);
+async function login( email, password){
+    const user = await userService.getUserByEmail(email);
    
  //if we don't find such user in database
     if(!user){
-        throw new Error ('No such user!')//taq gre6ka e za nas, tq 6te bude catchnata ot controllera i ve4e controllera 6te re6i kakva gre6ka da vurne na potrebitelq
+        const err = new Error ('No such user!');
+        err.type = 'credential';
+        throw err;//taq gre6ka e za nas, tq 6te bude catchnata ot controllera i ve4e controllera 6te re6i kakva gre6ka da vurne na potrebitelq
     }
 
    //if is there, then we compare passwords
@@ -68,7 +70,9 @@ async function login( username, password){
     
 //if is there is no match
     if(!hasMatch){
-        throw new Error ('Incorrect password!')//taq gre6ka e za nas, tq 6te bude catchnata ot controllera i ve4e controllera 6te re6i kakva gre6ka da vurne na potrebitelq
+        const err = new Error ('Incorrect password!')
+        err.type = 'credential';
+        throw err;//taq gre6ka e za nas, tq 6te bude catchnata ot controllera i ve4e controllera 6te re6i kakva gre6ka da vurne na potrebitelq
     }
 
     //if there is a match we have to do 2 things
@@ -83,8 +87,9 @@ async function login( username, password){
 function generateToken(userData){
 return jwt.sign({
     _id: userData._id,
+    email: userData.email,
     username: userData.username,
-    email: userData.email
+  
 }, TOKEN_SECRET)
 }
 

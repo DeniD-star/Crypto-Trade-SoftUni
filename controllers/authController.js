@@ -8,8 +8,9 @@ router.get('/register', isGuest(), (req, res) => {
 })
 
 router.post('/register',
-body('email', 'Email is required!').isEmail().withMessage('Invalid email!').isLength({ min: 10 }).withMessage('Email must be at least 10 characters long!'),
+
     body('username', 'Username is required!').isLength({ min: 5 }).withMessage('Username must be at least 5 characters long!'),
+    body('email', 'Email is required!').isEmail().withMessage('Invalid email!').isLength({ min: 10 }).withMessage('Email must be at least 10 characters long!'),
     body('password', 'Password is required!').isLength({ min: 4 }).withMessage('Password must be at least 3 characters long!'),
     body('rePass', 'Repeat password, please!').custom((value, { req }) => {
         if (value !== req.body.password) {
@@ -27,7 +28,7 @@ body('email', 'Email is required!').isEmail().withMessage('Invalid email!').isLe
                 throw new Error(Object.values(errors).map(e=>e.msg).join('\n'))
             }
             console.log(errors);
-            await req.auth.register( req.body.email.trim(), req.body.username.trim(), req.body.password.trim());
+            await req.auth.register(  req.body.username.trim(), req.body.email.trim(), req.body.password.trim());
             console.log(req.auth);
             res.redirect('/');
         } catch (err) {

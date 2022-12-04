@@ -1,9 +1,10 @@
 const User = require('../models/User');
 
-async function createUser(email, username, hashedPassword){
+async function createUser( username, email, hashedPassword){
     const user = new User({
-        email,
+      
         username,
+        email,
         hashedPassword,
         cryptoBuy: []
     })
