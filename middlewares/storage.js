@@ -1,6 +1,8 @@
-module.exports = ()=> (req, res, next)=>{
-    req.storage = {
+const cryptoService = require('../services/cryptoService')
 
+module.exports = () => (req, res, next) => {
+    req.storage = {
+        ...cryptoService
     };
     next()
 }
