@@ -2,9 +2,9 @@
         <section class="crypto-search">
             <h1>Search</h1>
 
-            <form class="search-form" action="#" method="">
-                <input type="text" class="search-coin" name="" placeholder="Search here...">
-                <select id="payment" name="">
+            <form class="search-form" action="/cryptos/search" method="POST">
+                <input type="text" class="search-coin" name="search" placeholder="Search here...">
+                <select id="payment" name="paymentMethod">
                     <option value="crypto-wallet">Crypto Wallet</option>
                     <option value="credit-card">Credit Card</option>
                     <option value="debit-card">Debit Card</option>
@@ -17,7 +17,7 @@
                 <div class="search-list">
                     <div class="coin">
                         <div class="coin-img">
-                            <img src="./static/images/ethereum.png">
+                            <img src="/static/images/ethereum.png">
                         </div>
                         <div class="coin-info">
                             <h1>Ethereum</h1>
@@ -25,7 +25,7 @@
                             <p><span>Payment: </span>debit-card</p>
                         </div>
 
-                        <a href="#" class="btn-details">Details</a>
+                        <a href="/cryptos/details/{{crypto._id}}" class="btn-details">Details</a>
                     </div>
                 </div>
 

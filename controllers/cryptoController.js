@@ -2,6 +2,7 @@
 const { parseError } = require('../util/parse');
 const { isUser } = require('../middlewares/guards');
 const storage = require('../middlewares/storage');
+const { getUserByEmail } = require('../services/userService');
 
 const router = require('express').Router();
 
@@ -55,13 +56,17 @@ router.get('/details/:id', async(req, res)=>{
     try {
 
         const crypto = await req.storage.getCryptoById(req.params.id);
+        const user = await getUserByEmail(req.user.email);
+        console.log(user);
         crypto.hasUser = Boolean(req.user);
         crypto.isOwner = req.user && req.user._id == crypto.owner;
+        crypto.bought = req.user && user.cryptoBuy.includes(crypto._id) // i tuk izpolzvam includes vmesto find
+     console.log(Boolean(crypto.bought));
         res.render('details', {crypto})
         
     } catch (err) {
         console.log(err.message);
-        res.redirect('/404')
+        res.redirect('/cryptos/404')
     }
 })
 
@@ -95,5 +100,45 @@ router.post('/edit/:id', isUser(), async(req, res)=>{
         }
         res.render('edit', ctx)
     }
+})
+
+router.get('/delete/:id', isUser(), async(req, res)=>{
+    try {
+
+        const crypto = await req.storage.deleteCrypto(req.params.id);
+
+        if (crypto.author != req.user._id) {
+            throw new Error('Cannot delete a crypto you have not created!')
+        }
+
+        res.redirect('/cryptos/trade');
+
+    } catch (err) {
+
+        res.redirect('/cryptos/details/' + req.params.id)
+    }
+})
+
+router.get('/buy/:id', isUser(), async(req, res) => {
+    try {
+
+        await req.storage.buyCrypto(req.params.id, req.user._id);
+
+        res.redirect('/cryptos/details/' + req.params.id);
+
+    } catch (err) {
+        console.log(err.message);
+        res.redirect('/');
+    }
+})
+
+router.get('/404', async(req, res) => {
+   res.render('404')
+})
+
+
+router.get('/search', async(req, res)=>{
+    const cryptos = await req.storage.getAllCryptos(req.query);
+    res.render('search', {cryptos})
 })
 module.exports = router;
